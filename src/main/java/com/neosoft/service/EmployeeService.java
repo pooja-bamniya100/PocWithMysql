@@ -1,6 +1,7 @@
 package com.neosoft.service;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,11 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.neosoft.Entity.IdOrPasswordEntity;
 import com.neosoft.dao.Emp_AddressRepository;
 import com.neosoft.dao.Employee_MasterRepository;
 import com.neosoft.exception.ResourceNotFoundException;
@@ -29,7 +34,7 @@ import com.neosoft.model.Employee_contacts;
 import com.neosoft.model.Employment_Detail;
 
 @Service
-public class EmployeeService {
+public class EmployeeService implements  UserDetailsService{
 
 	@Autowired
 	Employee_MasterRepository employee_MasterRepository;
@@ -37,7 +42,21 @@ public class EmployeeService {
 	@Autowired
 	Emp_AddressRepository emp_AddressRepository;
 
-	/*
+	/**
+	 * .override method of UserDetailsService
+	 *
+	 * @param username the employee username
+	 * @return the User
+	 */
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Employee_Master employee = employee_MasterRepository.findByUsername(username);
+		if(employee==null)
+			throw new UsernameNotFoundException("User Not Found with username: " + username);
+        return new org.springframework.security.core.userdetails.User(employee.getUsername(), employee.getPassword(), new ArrayList<>());
+	}
+	
+	/**
 	 * Create Employee_Master employee.
 	 *
 	 * @param employee the employee
@@ -59,7 +78,7 @@ public class EmployeeService {
 
 	}
 
-	/*
+	/**
 	 * Delete Employee 
 	 *
 	 * @param id the employee id
@@ -78,7 +97,7 @@ public class EmployeeService {
 		return "Employee" + id + " sucsessfully deleted";
 	}
 
-	/*
+	/**
 	 * deactivate the employee
 	 * 
 	 * @param id the employee id
@@ -102,7 +121,7 @@ public class EmployeeService {
 
 
 	
-	/*
+	/**
 	sorting based on dob or date of joining
 	@param orderBy order by acsending or descending
 	 *@param sortBy sort by dob or dateOfjoin
@@ -128,7 +147,7 @@ public class EmployeeService {
 		return list;
 
 	}
-	/*
+	/**
 	 * Get all search employee .
 	 * 
 	 *@param searchBy search by firstname or lastmane or pincode
@@ -140,7 +159,7 @@ public class EmployeeService {
 
 		List<Employee_Master> list = list = employee_MasterRepository.findByFirstNameOrLastNamePincode(searchBy);
 		if (list.isEmpty())
-			throw new ResourceNotFoundException("Employee not found having " + searchBy);
+			throw new ResourceNotFoundException("Employee not found ha ving " + searchBy);
 		else
 			return list;
 
@@ -157,7 +176,7 @@ public class EmployeeService {
 		return list;
 
 	}
-	/*
+	/**
 	 * Gets Employee by id.
 	 *
 	 * @param id the employee id
@@ -173,7 +192,7 @@ public class EmployeeService {
 			return emp;
 		}
 	}
-	/*
+	/**
 	 * Gets Employee by status.
 	 *
 	 * @return the active employee
@@ -183,7 +202,7 @@ public class EmployeeService {
 		return employee_MasterRepository.findAllByStatus(true);
 	}
 
-	/*
+	/**
 	 * Gets Employee by status.
 	 *
 	 * @return the Deactive employee
@@ -259,15 +278,40 @@ public class EmployeeService {
 			  existingEmployee.setEmp_Education(emp_Education);
 			return employee_MasterRepository.save(existingEmployee);
 			
-			  
-			 		
-		
-			
-			
-			
-			
 		
 		}
+	}
+
+	/**
+	 * Update Employee_master password.
+	 * 
+	 * @param idOrPasswordEntity the IdOrPasswordEntity having new password
+	 * @return the string value
+	 * @throws ResourceNotFoundException the resource not found exception
+	 */
+	public String updatePassword(long id,IdOrPasswordEntity idOrPasswordEntity) throws ResourceNotFoundException {
+		// TODO Auto-generated method stub
+		Employee_Master existingEmployee = null;
+
+		existingEmployee = employee_MasterRepository.findById(id).orElse(null);
+		if (existingEmployee == null)
+			throw new ResourceNotFoundException("Employee not found having id" + id);
+		else {
+			
+			if(existingEmployee.getEmp_contacts().getEmail().equals(idOrPasswordEntity.getEmail()))
+			{
+			    if(existingEmployee.getPassword() ==idOrPasswordEntity.getPassword())    
+				      employee_MasterRepository.updatePassword(idOrPasswordEntity.getPassword(),existingEmployee.getEmp_id());
+			
+				else
+					return  "Your current password not correct";
+			} 
+			else
+				return "Your email id not correct";
+
+		}
+				return "password  successfully updated";
+	
 	}
 
 }

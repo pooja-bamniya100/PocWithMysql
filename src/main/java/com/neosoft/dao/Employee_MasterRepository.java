@@ -16,7 +16,7 @@ import com.neosoft.model.Employee_Master;
 @Repository
 public interface Employee_MasterRepository extends JpaRepository<Employee_Master, Long> {
 
-	/*
+	/**
 	 * search employee by lastname or firstname or pincode
 	 * 
 	 * @param searchBy the search by given value
@@ -30,7 +30,7 @@ public interface Employee_MasterRepository extends JpaRepository<Employee_Master
 	List<Employee_Master> findByFirstNameOrLastNamePincode(Object searchBy);
 
 
-	/*
+	/**
 	 * sort the employee by dob in ascending
 	 * 
 	 * @return sorted list ascending
@@ -38,7 +38,7 @@ public interface Employee_MasterRepository extends JpaRepository<Employee_Master
 	@Query("select em from Employee_Master em order by  employee_detail.dob asc")
 	List<Employee_Master> sortByDobAsc();
 
-	/*
+	/**
 	 * sort the employee by dob in descending
 	 * 
 	 * @return sorted list descending
@@ -46,14 +46,14 @@ public interface Employee_MasterRepository extends JpaRepository<Employee_Master
 	@Query("select em from Employee_Master em order by  employee_detail.dob desc")
 	List<Employee_Master> sortByDobDsc();
 
-	/*
+	/**
 	 * sort the employee by dateofjoiniing in ascending
 	 * @return sorted list ascending
 	 */
 	@Query("select em from Employee_Master em order by  employment_Detail.joining_date asc")
 	List<Employee_Master> sortByDateOfJoinAsc( );
 
-	/*
+	/**
 	 * sort the employee by dateofjoiniing in descending
 	 * 
 	 * @return sorted list descending
@@ -61,7 +61,7 @@ public interface Employee_MasterRepository extends JpaRepository<Employee_Master
 	@Query("select em from Employee_Master em order by  employment_Detail.joining_date desc")
 	List<Employee_Master> sortByDateOfJoinDsc();
 
-	/*
+	/**
 	 * search employee by status
 	 * 
 	 * @param staus the status active or not
@@ -70,6 +70,22 @@ public interface Employee_MasterRepository extends JpaRepository<Employee_Master
 	 */
 	@Query("select em from Employee_Master em where em.active=?1")
 	List<Employee_Master> findAllByStatus(boolean status);
+
+	/**
+	 * update employee password
+	 * 
+	 * @param id 
+	 * 
+	 * @return password the password which update
+	 */
+	@Query(value="update employee_master (employee_master.password) set value(?1) where employee_master.emp_id=?2",nativeQuery = true)
+	void updatePassword(String password,long id);
+
+
+	Employee_Master findByUsername(String username);
+
+
+
 
 
 

@@ -14,7 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
-
+import com.neosoft.Entity.AddressEntity;
+import com.neosoft.Entity.EducationEntity;
+import com.neosoft.Entity.EmpDetailEntity;
+import com.neosoft.Entity.RoleEntity;
+import com.neosoft.Entity.ContactsEntity;
+import com.neosoft.Entity.EmploymentEntity;
+import com.neosoft.Entity.RequestModel;
+import com.neosoft.Entity.ResponceModel;
 import com.neosoft.exception.PasswordNotMatchException;
 import com.neosoft.model.Emp_Address;
 import com.neosoft.model.Emp_Education;
@@ -23,9 +30,6 @@ import com.neosoft.model.Employee_Master;
 import com.neosoft.model.Employee_Role;
 import com.neosoft.model.Employee_contacts;
 import com.neosoft.model.Employment_Detail;
-import com.neosoft.model.ResponceModel;
-
-import Entity.RequestModel;
 
 
 
@@ -37,24 +41,62 @@ public abstract class EmployeeAbstractClass {
 	 *  @param employee_master the Employee_Master object
 	 * 
 	 *  */
-	
-	
+
+
 	protected  ResponseEntity responceBuilder(Employee_Master employee_Master)
 	{
-		
+
 		ResponceModel responce=getResponceModel(employee_Master);
 		return new ResponseEntity(responce,HttpStatus.OK);
 
 
 	}
+	
 	public Employee_Master getEmployee(RequestModel model)
 	{
-		Employee_Master employee=new Employee_Master();
-   	 BeanUtils.copyProperties(model,employee);
-		return employee;
+		Employee_contacts emp_contacts=new Employee_contacts();
+		Employee_Detail employee_Detail=new Employee_Detail();
+	    Employee_Role employee_role=new Employee_Role();
+	     Employment_Detail employment_Detail=new Employment_Detail();
+	     Emp_Address emp_Address=new Emp_Address();
+	     Emp_Education emp_Education=new Emp_Education();
 		
-	}
+		Employee_Master employee=new Employee_Master();
+		employee.setUsername(model.getUsername());
+		employee.setPassword(model.getPassword());
+		employee.setConfirmPassword(model.getConfirmPassword());
+		
+		BeanUtils.copyProperties(model.getEmp_contacts(),emp_contacts);
+		BeanUtils.copyProperties(model.getEmployee_detail(),employee_Detail);
+		BeanUtils.copyProperties(model.getEmployee_Role(),employee_role);
+		BeanUtils.copyProperties(model.getEmployment_Detail(),employment_Detail);
+		
+		List<AddressEntity> add_list=model.getAddress();
+		List<EducationEntity> edu_list=model.getEmp_Education();
+		List<Emp_Address> emp_add_list=new ArrayList();
+		List<Emp_Education> emp_edu_list=new ArrayList();
+		
+		for(int i=0;i<edu_list.size();i++) {
+			BeanUtils.copyProperties(edu_list.get(i),emp_Education)	;
+			emp_edu_list.add(emp_Education);
+		}
+		
+		for(int i=0;i<add_list.size();i++) {
+			BeanUtils.copyProperties(add_list.get(i),emp_Address)	;
+			emp_add_list.add(emp_Address);
+		}
+		
+		employee.setAddress(emp_add_list);
+		employee.setEmp_contacts(emp_contacts);
+		employee.setEmp_Education(emp_edu_list);
+		employee.setEmployee_detail(employee_Detail);
+		employee.setEmployee_Role(employee_role);
+		employee.setEmployment_Detail(employment_Detail);
 	
+		return employee;
+
+	}
+
 	/**
 	 * 
 	 *  method to create a responce 
@@ -64,16 +106,17 @@ public abstract class EmployeeAbstractClass {
 	 *  */
 	protected  ResponseEntity responceBuilder(List<Employee_Master> employee_Master)
 	{ 
+		
 		List<ResponceModel> responce=new ArrayList();
 		for(int i=0;i<employee_Master.size();i++)
 			responce.add(getResponceModel(employee_Master.get(i)));
-		
+
 
 		return new ResponseEntity(responce,HttpStatus.OK);
 
 
 	}
-	
+
 	/**
 	 * 
 	 *  method to create a responceModel object 
@@ -84,26 +127,47 @@ public abstract class EmployeeAbstractClass {
 	protected ResponceModel getResponceModel(Employee_Master employee_Master)
 	{
 		
-		String name=employee_Master.getEmployee_detail().getFirstname()+" "+employee_Master.getEmployee_detail().getLastname();
-		String email=employee_Master.getEmp_contacts().getEmail();
-		 String username=employee_Master.getUsername();
-		List<Emp_Address> e_address=employee_Master.getAddress();
-		List<Emp_Education> e_edu=employee_Master.getEmp_Education();
-		List<String> address=new ArrayList();
-		List<String> education=new ArrayList();
-		for(int i=0;i<e_address.size();i++)
-		{
-			address.add(e_address.get(i).getAddType()+" : "+e_address.get(i).getCity()+" ,"+e_address.get(i).getDist()+" ,"
-					+ " "+e_address.get(i).getState()+" ,"+e_address.get(i).getCountry()+" ,"+e_address.get(i).getPincode());
-		}
-		for(int i=0;i<e_edu.size();i++)
-		{
-			education.add(e_edu.get(i).getQualification()+" perc :"+e_edu.get(i).getPerc()+" pass year :"+e_edu.get(i).getPass_year());
+       ResponceModel responce=new ResponceModel();
+		
+      ContactsEntity emp_contacts=new ContactsEntity();
+       EmpDetailEntity employee_Detail=new EmpDetailEntity();
+       RoleEntity employee_role=new RoleEntity();
+      EmploymentEntity employment_Detail=new EmploymentEntity();
+       AddressEntity emp_Address=new AddressEntity();
+      EducationEntity emp_Education=new EducationEntity();
+		
+		responce.setUsername(employee_Master.getUsername());
+		responce.setEmp_id(employee_Master.getEmp_id());
+		responce.setPassword(employee_Master.getPassword());
+		BeanUtils.copyProperties(employee_Master.getEmp_contacts(),emp_contacts);
+		BeanUtils.copyProperties(employee_Master.getEmployee_detail(),employee_Detail);
+		BeanUtils.copyProperties(employee_Master.getEmployee_Role(),employee_role);
+		BeanUtils.copyProperties(employee_Master.getEmployment_Detail(),employment_Detail);
+		
+		List<Emp_Address> emp_add_list=employee_Master.getAddress();
+		List<Emp_Education> emp_edu_list=employee_Master.getEmp_Education();
+		List<AddressEntity> add_list=new ArrayList();
+		List<EducationEntity> edu_list=new ArrayList();
+		
+		for(int i=0;i<emp_edu_list.size();i++) {
+			BeanUtils.copyProperties(emp_edu_list.get(i),emp_Education)	;
+			edu_list.add(emp_Education);
 		}
 		
-		 Long salary=employee_Master.getEmployment_Detail().getSalary();
-	
-		return new ResponceModel(name,username,address,salary,education,email);	
+		for(int i=0;i<emp_add_list.size();i++) {
+			BeanUtils.copyProperties(emp_add_list.get(i),emp_Address)	;
+			add_list.add(emp_Address);
+		}
+		
+		responce.setAddress(add_list);
+		responce.setEmp_contacts(emp_contacts);
+		responce.setEmp_Education(edu_list);
+		responce.setEmployee_detail(employee_Detail);
+		responce.setEmployee_Role(employee_role);
+		responce.setEmployment_Detail(employment_Detail);
+       
+
+		return responce;	
 	}
 
 	/**
@@ -129,9 +193,9 @@ public abstract class EmployeeAbstractClass {
 	 *  @param emp the type of Employee_Master
 	 *  
 	 *   */
-	 
+
 	protected void validContact(Employee_Master emp) {
-		
+
 		Employee_contacts employee_contacts=emp.getEmp_contacts();
 		if( String.valueOf(employee_contacts.getAltername_contact() ).length()!=10) {
 			if( String.valueOf(employee_contacts.getAltername_contact() ).length()!=10)
@@ -141,7 +205,7 @@ public abstract class EmployeeAbstractClass {
 			}
 		}
 	}
-	
+
 	/**
 	 * 
 	 *  method to check validation for all data
@@ -149,19 +213,17 @@ public abstract class EmployeeAbstractClass {
 	 *  
 	 *   */
 	public void validData(Employee_Master emp)
-	
-	
-	{  
-		Date d=new Date(2020,06,25);
 
-		
+
+	{  
+
 		Employee_Detail employee_Detail=emp.getEmployee_detail();
 		Employee_Role employee_Role=emp.getEmployee_Role();
 		List<Emp_Address> emp_Address=emp.getAddress();
 		List<Emp_Education> emp_Education=emp.getEmp_Education();
 		Employment_Detail employment_Detail=emp.getEmployment_Detail();
 
-		
+		Date d=new Date(2020,06,25);
 
 		if(employee_Detail.getDob().before(d)) {
 
@@ -188,27 +250,6 @@ public abstract class EmployeeAbstractClass {
 
 	}
 
-	/**
-	 *  to set request value
-	 *  
-	 *   */
-	protected Employee_Master requestBuilder(RequestModel requestModel)
-	{
-		Employee_Master employee_Master=new Employee_Master();
-		
-		employee_Master.setPassword(requestModel.getPassword());
-		employee_Master.setUsername(requestModel.getUsername());
-		employee_Master.setConfirmPassword(requestModel.getConfirmPassword());
-		employee_Master.setEmp_contacts(requestModel.getEmp_contacts());
-		employee_Master.setEmployee_detail(requestModel.getEmployee_detail());
-		employee_Master.setEmployee_Role(requestModel.getEmployee_Role());
-		employee_Master.setEmp_Education(requestModel.getEmp_Education());
-		employee_Master.setAddress(requestModel.getAddress());
-		
-		
-		
-		return employee_Master;
-		
-	}
+
 
 }
