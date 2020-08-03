@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: com.neosoft.EmployeeControllerTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.854 s <<< FAILURE! - in com.neosoft.EmployeeControllerTest
+testGetDeactiveEmployee  Time elapsed: 0.022 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <[com.neosoft.model.Employee_Master@1863d2fe, com.neosoft.model.Employee_Master@1863d2fe]> but was: <[]>
+	at com.neosoft.EmployeeControllerTest.testGetDeactiveEmployee(EmployeeControllerTest.java:251)
+

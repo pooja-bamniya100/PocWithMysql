@@ -1,0 +1,23 @@
+-------------------------------------------------------------------------------
+Test set: com.neosoft.EmployeeServiceTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 1, Errors: 1, Skipped: 0, Time elapsed: 0.221 s <<< FAILURE! - in com.neosoft.EmployeeServiceTest
+testGetDeactiveEmployee  Time elapsed: 0.003 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <[com.neosoft.model.Employee_Master@39de3d36, com.neosoft.model.Employee_Master@39de3d36]> but was: <[]>
+	at com.neosoft.EmployeeServiceTest.testGetDeactiveEmployee(EmployeeServiceTest.java:271)
+
+testgetEmployee  Time elapsed: 0.02 s  <<< ERROR!
+org.mockito.exceptions.misusing.WrongTypeOfReturnValue: 
+
+Employee_Master cannot be returned by findById()
+findById() should return Optional
+***
+If you're unsure why you're getting above error read on.
+Due to the nature of the syntax above problem might occur because:
+1. This exception *might* occur in wrongly written multi-threaded tests.
+   Please refer to Mockito FAQ on limitations of concurrency testing.
+2. A spy is stubbed using when(spy.foo()).then() syntax. It is safer to stub spies - 
+   - with doReturn|Throw() family of methods. More in javadocs for Mockito.spy() method.
+
+	at com.neosoft.EmployeeServiceTest.testgetEmployee(EmployeeServiceTest.java:248)
+
